@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ClientBase {
-    public static Minecraft mc;
+    public static Minecraft mc = Minecraft.getInstance();
     public static Logger logger = LogManager.getLogger("Client");
     public static float yaw;
     public static boolean isLoading;

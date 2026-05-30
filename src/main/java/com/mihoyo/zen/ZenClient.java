@@ -32,7 +32,7 @@ public class ZenClient extends ClientBase {
     public static float serverTickRate;
     public static boolean isReady;
     public static boolean isMCPMapped;
-    public static String configDir = System.getProperty("user.home") + File.separator + ".zen";
+    public static String configDir = mc.gameDirectory + ".zen";
     public static String username = "";
 
     private static final String[] CLOUD_ASSET_NAMES = { "panel.png", "ptr.png", "lie.wav", "truth.wav" };
