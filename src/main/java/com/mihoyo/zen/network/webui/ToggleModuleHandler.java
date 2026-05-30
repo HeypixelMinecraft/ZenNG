@@ -1,6 +1,7 @@
 package com.mihoyo.zen.network.webui;
 
 import com.google.gson.Gson;
+import com.mihoyo.zen.ClientBase;
 import com.mihoyo.zen.ZenClient;
 import com.mihoyo.zen.exception.ModuleNotFoundException;
 import com.mihoyo.zen.modules.Module;
@@ -13,6 +14,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class ToggleModuleHandler extends AbstractHttpHandler {
     private static final Gson GSON = new Gson();
@@ -36,7 +38,8 @@ public class ToggleModuleHandler extends AbstractHttpHandler {
                     success = true;
                     reason = "This module cannot be toggled from WebUI";
                 } else {
-                    module.setEnabled(Boolean.parseBoolean(query.get("state")));
+                    boolean requestedState = Boolean.parseBoolean(query.get("state"));
+                    setEnabledOnClientThread(module, requestedState);
                     state = module.isEnabled();
                     success = true;
                 }
@@ -63,5 +66,22 @@ public class ToggleModuleHandler extends AbstractHttpHandler {
         } catch (ModuleNotFoundException e) {
             return null;
         }
+    }
+
+    private static void setEnabledOnClientThread(Module module, boolean state) {
+        if (ClientBase.mc == null || ClientBase.mc.isSameThread()) {
+            module.setEnabled(state);
+            return;
+        }
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        ClientBase.mc.execute(() -> {
+            try {
+                module.setEnabled(state);
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+        future.join();
     }
 }
