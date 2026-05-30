@@ -59,6 +59,7 @@ import com.mihoyo.zen.modules.impl.render.Compass;
 import com.mihoyo.zen.modules.impl.render.DamageGlow;
 import com.mihoyo.zen.modules.impl.render.ESP;
 import com.mihoyo.zen.modules.impl.render.FullBright;
+import com.mihoyo.zen.modules.impl.render.HudEditor;
 import com.mihoyo.zen.modules.impl.render.Interface;
 import com.mihoyo.zen.modules.impl.render.ItemTags;
 import com.mihoyo.zen.modules.impl.render.NameProtect;
@@ -137,6 +138,7 @@ public class ModuleManager extends ClientBase {
         this.register(new DamageGlow());
         this.register(new ESP());
         this.register(new FullBright());
+        this.register(new HudEditor());
         this.register(new Interface());
         this.register(new ItemTags());
         this.register(new NameProtect());

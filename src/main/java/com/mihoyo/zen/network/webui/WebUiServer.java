@@ -13,6 +13,7 @@ public final class WebUiServer {
     public static final int PORT = 8089;
     public static final String BASE_URL = "http://127.0.0.1:" + PORT;
     public static final String SVELTE_GUI_URL = BASE_URL + "/svelte-gui/index.html";
+    public static final String SVELTE_HUD_URL = BASE_URL + "/svelte-gui/index.html?view=hud";
 
     private static HttpServer httpServer;
 
@@ -57,6 +58,7 @@ public final class WebUiServer {
         server.createContext("/api/setModuleSettingValue", new SetSettingHandler());
         server.createContext("/api/getModuleSetting", new SettingsHandler());
         server.createContext("/api/gui/state", new GuiStateHandler());
+        server.createContext("/api/ui/state", new UiStateHandler());
         server.createContext("/svelte-gui", new StaticFileHandler("/svelte-gui", "/svelte-gui"));
         server.createContext("/", new StaticFileHandler("/webui", "/"));
         server.start();

@@ -8,6 +8,7 @@ import com.mihoyo.zen.ZenClient;
 import com.mihoyo.zen.event.impl.GlRenderEvent;
 import com.mihoyo.zen.event.impl.Render2DEvent;
 import com.mihoyo.zen.event.impl.TickEvent;
+import com.mihoyo.zen.gui.svelte.SvelteHudOverlay;
 import com.mihoyo.zen.gui.IntroAnimation;
 import com.mihoyo.zen.hud.HudElement;
 import com.mihoyo.zen.hud.KeyBindsHud;
@@ -70,6 +71,9 @@ public class HudManager {
         if (IntroAnimation.isRunning()) {
             return;
         }
+        if (SvelteHudOverlay.render(render2DEvent)) {
+            return;
+        }
         for (HudElement hudElement : this.getHudElements()) {
             if (!hudElement.isEnabled()) continue;
             hudElement.onRender2D(render2DEvent, hudElement.getX(), hudElement.getY());
@@ -79,6 +83,9 @@ public class HudManager {
     @EventTarget
     public void onGlRender(GlRenderEvent glRenderEvent) {
         if (IntroAnimation.isRunning()) {
+            return;
+        }
+        if (SvelteHudOverlay.isActive()) {
             return;
         }
         for (HudElement hudElement : this.getHudElements()) {

@@ -37,6 +37,7 @@ import com.mihoyo.zen.event.impl.Render2DEvent;
 import com.mihoyo.zen.event.impl.RenderEvent;
 import com.mihoyo.zen.event.impl.TickEvent;
 import com.mihoyo.zen.event.impl.UpdateHeldItemEvent;
+import com.mihoyo.zen.gui.svelte.SvelteHudOverlay;
 import com.mihoyo.zen.modules.Category;
 import com.mihoyo.zen.modules.Module;
 import com.mihoyo.zen.settings.impl.BooleanSetting;
@@ -357,6 +358,7 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {
+        if (SvelteHudOverlay.isActive()) return;
         if (mc.player == null || mc.level == null) return;
         int blockCount = this.getBlockSlot();
         if (blockCount == 0) return;

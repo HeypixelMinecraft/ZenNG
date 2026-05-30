@@ -27,6 +27,366 @@ main {
   background: rgba(0, 0, 0, 0.18);
 }
 
+.hud-root body,
+.hud-root #app {
+  background: transparent;
+}
+
+.hud-root main,
+.hud-overlay {
+  display: block;
+  place-items: unset;
+  background: transparent;
+  pointer-events: none;
+}
+
+.hud-overlay {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  color: #f8fbff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+
+.hud-panel,
+.effects,
+.target-hud,
+.lie-detector {
+  position: absolute;
+}
+
+.hud-panel {
+  min-width: 118px;
+  padding: 6px;
+  border-radius: 6px;
+  background: rgba(8, 10, 12, 0.46);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px);
+}
+
+.watermark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.watermark strong {
+  color: #7ef6ff;
+}
+
+.watermark em {
+  margin-left: 5px;
+  color: rgba(255, 255, 255, 0.72);
+  font-style: normal;
+  font-size: 11px;
+}
+
+.module-line {
+  font-size: 13px;
+  line-height: 15px;
+  font-weight: 700;
+  color: hsl(calc(var(--i) * 28), 86%, 66%);
+}
+
+.hud-panel header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 18px;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.hud-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 118px;
+  height: 20px;
+  padding: 0 5px;
+  margin-top: 3px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 12px;
+}
+
+.hud-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+kbd {
+  min-width: 24px;
+  padding: 2px 5px;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  text-align: center;
+}
+
+.effects {
+  display: grid;
+  gap: 3px;
+}
+
+.effect {
+  display: grid;
+  grid-template-columns: 22px minmax(80px, auto) auto;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  min-width: 132px;
+  padding-right: 7px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--effect) 42%, rgba(0, 0, 0, 0.46));
+  font-size: 12px;
+}
+
+.effect b {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  background: color-mix(in srgb, var(--effect) 70%, rgba(0, 0, 0, 0.35));
+  font-size: 11px;
+}
+
+.effect em {
+  color: rgba(255, 255, 255, 0.82);
+  font-style: normal;
+  font-size: 11px;
+}
+
+.target-hud {
+  display: grid;
+  grid-template-columns: 34px minmax(90px, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  width: 168px;
+  min-height: 46px;
+  padding: 7px;
+  border-radius: 8px;
+  background: rgba(8, 10, 12, 0.56);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px);
+}
+
+.target-avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #66d9ff, #ffd15d);
+  color: #111;
+  font-weight: 900;
+  text-shadow: none;
+}
+
+.target-main {
+  min-width: 0;
+}
+
+.target-main strong,
+.target-main span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.target-main strong {
+  font-size: 13px;
+}
+
+.target-main span,
+.target-hud em {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.health,
+.island-bar {
+  height: 5px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.health i,
+.island-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #62e889;
+}
+
+.dynamic-island {
+  position: absolute;
+  left: 50%;
+  top: var(--island-top);
+  width: var(--island-width);
+  height: var(--island-height);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.34);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(7px);
+}
+
+.watermark-island {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 100%;
+  padding: 0 8px;
+}
+
+.island-brand {
+  width: 22px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 23px;
+  line-height: 1;
+  font-weight: 900;
+  font-style: italic;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.55);
+}
+
+.island-separator {
+  width: 1px;
+  height: 10px;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.island-info {
+  display: grid;
+  gap: 0;
+  min-width: 22px;
+  line-height: 1;
+  text-align: center;
+}
+
+.island-info span {
+  color: #fff;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.island-info em {
+  color: rgba(170, 170, 170, 0.92);
+  font-size: 9px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.island-right {
+  min-width: 56px;
+}
+
+.dynamic-island.compact {
+  padding: 0 15px;
+}
+
+.scaffold-island,
+.autoplay-island {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.block-count {
+  min-width: 58px;
+  font-weight: 700;
+}
+
+.scaffold-bar {
+  height: 6px;
+  flex: 1;
+  min-width: 70px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(30, 30, 30, 0.9);
+}
+
+.scaffold-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: rgb(153, 0, 255);
+}
+
+.progress-ring {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.88);
+  border-radius: 50%;
+  font-size: 10px;
+}
+
+.autoplay-island strong,
+.tab-island {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.lie-detector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(8, 10, 12, 0.5);
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+}
+
+.meter {
+  position: relative;
+  width: 62px;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 62px 62px 0 0;
+  background: linear-gradient(90deg, #65e889, #f6c54a, #ff6b6b);
+}
+
+.meter i {
+  position: absolute;
+  left: 29px;
+  bottom: 0;
+  width: 3px;
+  height: 26px;
+  border-radius: 999px;
+  transform-origin: 50% 100%;
+  background: #fff;
+}
+
 .shell {
   width: min(1180px, calc(100vw - 96px));
   height: min(680px, calc(100vh - 96px));

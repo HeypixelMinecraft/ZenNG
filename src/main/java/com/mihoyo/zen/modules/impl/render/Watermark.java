@@ -2,6 +2,7 @@ package com.mihoyo.zen.modules.impl.render;
 
 import com.mihoyo.zen.event.impl.GlRenderEvent;
 import com.mihoyo.zen.event.impl.Render2DEvent;
+import com.mihoyo.zen.gui.svelte.SvelteHudOverlay;
 import com.mihoyo.zen.hud.DynamicIsland;
 import com.mihoyo.zen.hud.NeverloseWatermark;
 import com.mihoyo.zen.modules.Category;
@@ -20,6 +21,9 @@ public class Watermark extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent render2DEvent) {
+        if (SvelteHudOverlay.isActive()) {
+            return;
+        }
         if (!this.isEnabled()) {
             return;
         }
@@ -35,6 +39,9 @@ public class Watermark extends Module {
 
     @EventTarget
     public void onGlRender(GlRenderEvent glRenderEvent) {
+        if (SvelteHudOverlay.isActive()) {
+            return;
+        }
         if (!this.isEnabled()) {
             return;
         }
