@@ -1,0 +1,66 @@
+name: Build Jar
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 120
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build jar
+        shell: pwsh
+        run: .\gradlew.bat --no-daemon clean jar
+
+      - name: Stage jar artifact
+        shell: pwsh
+        run: |
+          $sha = git rev-parse --short=7 HEAD
+          $out = "build\ci-artifacts"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          Get-ChildItem "build\libs" -Filter "*.jar" |
+            Where-Object { $_.Name -notmatch "sources|javadoc|plain" } |
+            ForEach-Object {
+              $target = Join-Path $out ("ZenNG-$sha-" + $_.Name)
+              Copy-Item -Force $_.FullName $target
+              Write-Host "Staged $target"
+            }
+          if (-not (Get-ChildItem $out -Filter "*.jar" -ErrorAction SilentlyContinue)) {
+            throw "No jar artifacts were produced"
+          }
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZenNG-jar-${{ github.sha }}
+          path: build/ci-artifacts/*.jar
+          if-no-files-found: error
+          retention-days: 30
