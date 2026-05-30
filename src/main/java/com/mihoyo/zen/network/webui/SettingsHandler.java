@@ -1,24 +1,19 @@
 package com.mihoyo.zen.network.webui;
 
 import com.google.gson.Gson;
+import com.mihoyo.zen.ZenClient;
+import com.mihoyo.zen.exception.ModuleNotFoundException;
+import com.mihoyo.zen.modules.Module;
+import com.mihoyo.zen.utils.render.TextureUtil;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import com.mihoyo.zen.ZenClient;
-import com.mihoyo.zen.exception.ModuleNotFoundException;
-import com.mihoyo.zen.modules.Module;
-import com.mihoyo.zen.settings.Setting;
-import com.mihoyo.zen.settings.impl.BooleanSetting;
-import com.mihoyo.zen.settings.impl.ModeSetting;
-import com.mihoyo.zen.settings.impl.NumberSetting;
-import com.mihoyo.zen.utils.render.TextureUtil;
 
 public class SettingsHandler extends AbstractHttpHandler {
+    private static final Gson GSON = new Gson();
 
     @Override
     public int handleRequest(InputStream in, OutputStream out, HttpExchange exchange) throws Throwable {
@@ -30,44 +25,21 @@ public class SettingsHandler extends AbstractHttpHandler {
             try {
                 Module module = lookupModule(query.get("module"));
                 if (module == null) {
-                    reason = "找不到模块";
+                    reason = "Module not found";
                 } else {
-                    List<Setting<?>> settings = module.getSettings();
-                    List<Map<String, Object>> entries = new ArrayList<>();
-                    for (Setting<?> setting : settings) {
-                        Map<String, Object> entry = new HashMap<>();
-                        entry.put("name", setting.getName());
-                        entry.put("displayName", setting.getName());
-                        if (setting instanceof NumberSetting numberSetting) {
-                            entry.put("type", "slider");
-                            entry.put("max", numberSetting.getMax());
-                            entry.put("min", numberSetting.getMin());
-                            entry.put("step", numberSetting.getStep());
-                            entry.put("value", numberSetting.getValue());
-                        } else if (setting instanceof BooleanSetting) {
-                            entry.put("type", "checkbox");
-                            entry.put("value", setting.getValue());
-                        } else if (setting instanceof ModeSetting modeSetting) {
-                            entry.put("type", "selection");
-                            entry.put("value", modeSetting.getValue());
-                            entry.put("values", modeSetting.getModes());
-                        }
-                        entries.add(entry);
-                    }
-                    response.put("result", entries);
+                    response.put("result", GuiStateHandler.settings(module));
                     success = true;
                 }
             } catch (Throwable throwable) {
-                throwable.printStackTrace();
                 success = false;
                 reason = throwable.toString();
             }
         } else {
-            reason = "参数不足";
+            reason = "Missing module parameter";
         }
         response.put("success", success);
         response.put("reason", reason);
-        out.write(new Gson().toJson(response).getBytes(StandardCharsets.UTF_8));
+        out.write(GSON.toJson(response).getBytes(StandardCharsets.UTF_8));
         return 200;
     }
 

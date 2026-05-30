@@ -38,10 +38,10 @@ public class ModulesHandler extends AbstractHttpHandler {
             if (filter != null && module.getCategory() != filter) {
                 continue;
             }
-            Map<String, Object> entry = new HashMap<>();
+            Map<String, Object> entry = new HashMap<>(GuiStateHandler.moduleEntry(module));
             entry.put("desc", "");
             entry.put("state", module.isEnabled());
-            entry.put("settings", !module.getSettings().isEmpty());
+            entry.put("settings", entry.get("hasSettings"));
             result.put(module.getName(), entry);
         }
         response.put("result", result);

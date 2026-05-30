@@ -1,19 +1,21 @@
 package com.mihoyo.zen.network.webui;
 
 import com.google.gson.Gson;
+import com.mihoyo.zen.ZenClient;
+import com.mihoyo.zen.exception.ModuleNotFoundException;
+import com.mihoyo.zen.modules.Module;
+import com.mihoyo.zen.modules.impl.render.ClickGuiModule;
+import com.mihoyo.zen.modules.impl.world.WebUI;
+import com.mihoyo.zen.utils.render.TextureUtil;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import com.mihoyo.zen.ZenClient;
-import com.mihoyo.zen.exception.ModuleNotFoundException;
-import com.mihoyo.zen.modules.Module;
-import com.mihoyo.zen.modules.impl.world.WebUI;
-import com.mihoyo.zen.utils.render.TextureUtil;
 
 public class ToggleModuleHandler extends AbstractHttpHandler {
+    private static final Gson GSON = new Gson();
 
     @Override
     public int handleRequest(InputStream in, OutputStream out, HttpExchange exchange) throws Throwable {
@@ -28,17 +30,17 @@ public class ToggleModuleHandler extends AbstractHttpHandler {
                 if (module == null) {
                     state = false;
                     success = false;
-                    reason = "找不到模块";
-                } else if (module instanceof WebUI) {
-                    state = true;
+                    reason = "Module not found";
+                } else if (module instanceof WebUI || module instanceof ClickGuiModule) {
+                    state = module.isEnabled();
                     success = true;
+                    reason = "This module cannot be toggled from WebUI";
                 } else {
                     module.setEnabled(Boolean.parseBoolean(query.get("state")));
                     state = module.isEnabled();
                     success = true;
                 }
             } catch (Throwable throwable) {
-                throwable.printStackTrace();
                 state = false;
                 success = false;
                 reason = throwable.toString();
@@ -46,12 +48,12 @@ public class ToggleModuleHandler extends AbstractHttpHandler {
         } else {
             state = false;
             success = false;
-            reason = "参数不足";
+            reason = "Missing module or state parameter";
         }
         response.put("success", success);
         response.put("reason", reason);
         response.put("result", state);
-        out.write(new Gson().toJson(response).getBytes(StandardCharsets.UTF_8));
+        out.write(GSON.toJson(response).getBytes(StandardCharsets.UTF_8));
         return 200;
     }
 

@@ -1,28 +1,23 @@
 package com.mihoyo.zen.network.webui;
 
 import com.google.gson.Gson;
+import com.mihoyo.zen.ZenClient;
+import com.mihoyo.zen.exception.ModuleNotFoundException;
+import com.mihoyo.zen.modules.Module;
+import com.mihoyo.zen.modules.impl.world.WebUI;
+import com.mihoyo.zen.settings.Setting;
+import com.mihoyo.zen.utils.render.TextureUtil;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-import com.mihoyo.zen.ZenClient;
-import com.mihoyo.zen.exception.ModuleNotFoundException;
-import com.mihoyo.zen.modules.Module;
-import com.mihoyo.zen.modules.impl.world.WebUI;
-import com.mihoyo.zen.settings.Setting;
-import com.mihoyo.zen.settings.impl.BooleanSetting;
-import com.mihoyo.zen.settings.impl.ModeSetting;
-import com.mihoyo.zen.settings.impl.NumberSetting;
-import com.mihoyo.zen.utils.render.TextureUtil;
 
 public class SetSettingHandler extends AbstractHttpHandler {
+    private static final Gson GSON = new Gson();
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public int handleRequest(InputStream in, OutputStream out, HttpExchange exchange) throws Throwable {
         Map<String, String> query = TextureUtil.parseQueryString(exchange.getRequestURI().getQuery());
         Map<String, Object> response = new HashMap<>();
@@ -33,58 +28,34 @@ public class SetSettingHandler extends AbstractHttpHandler {
             try {
                 Module module = lookupModule(query.get("module"));
                 if (module == null) {
-                    reason = "找不到模块";
+                    reason = "Module not found";
                 } else if (module instanceof WebUI) {
-                    reason = "sb";
+                    reason = "WebUI cannot be edited from WebUI";
                 } else {
                     String settingName = query.get("name");
-                    Optional<Setting<?>> match = module.getSettings().stream()
-                            .filter(setting -> setting.getName().equals(settingName))
-                            .findFirst();
-                    if (match.isEmpty()) {
-                        reason = "找不到参数";
+                    success = GuiStateHandler.applySetting(module, settingName, query.get("value"));
+                    if (success) {
+                        result = module.getSettings().stream()
+                                .filter(setting -> setting.getName().equals(settingName))
+                                .findFirst()
+                                .map(Setting::getValue)
+                                .orElse(null);
                     } else {
-                        Setting setting = match.get();
-                        String raw = query.get("value");
-                        if (setting instanceof NumberSetting) {
-                            try {
-                                setting.setValue(Double.valueOf(raw));
-                                success = true;
-                            } catch (NumberFormatException ignored) {
-                            }
-                        } else if (setting instanceof BooleanSetting) {
-                            setting.setValue(Boolean.valueOf(raw));
-                            success = true;
-                        } else if (setting instanceof ModeSetting modeSetting) {
-                            String matchedMode = Stream.of(modeSetting.getModes())
-                                    .filter(mode -> mode.equals(raw))
-                                    .findFirst()
-                                    .orElse(null);
-                            if (matchedMode != null) {
-                                modeSetting.setValue(matchedMode);
-                                success = true;
-                            }
-                        }
-                        if (success) {
-                            result = setting.getValue();
-                        } else {
-                            reason = "无效的值";
-                        }
+                        reason = "Invalid setting or value";
                     }
                 }
             } catch (Throwable throwable) {
-                throwable.printStackTrace();
                 success = false;
                 reason = throwable.toString();
             }
         } else {
             result = false;
-            reason = "参数不足";
+            reason = "Missing module, name, or value parameter";
         }
         response.put("success", success);
         response.put("reason", reason);
         response.put("result", result);
-        out.write(new Gson().toJson(response).getBytes(StandardCharsets.UTF_8));
+        out.write(GSON.toJson(response).getBytes(StandardCharsets.UTF_8));
         return 200;
     }
 
