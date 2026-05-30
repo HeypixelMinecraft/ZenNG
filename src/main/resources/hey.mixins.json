@@ -1,0 +1,36 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "shit.zen.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "hey.refmap.json",
+  "mixins": [
+    "ClientLevelMixin",
+    "ConnectionMixin",
+    "EntityMixin",
+    "FriendlyByteBufMixin",
+    "HumanoidModelMixin",
+    "ItemMixin",
+    "LivingEntityMixin",
+    "PacketUtilsMixin",
+    "PlayerMixin"
+  ],
+  "client": [
+    "ChatScreenMixin",
+    "EntityRendererMixin",
+    "GameRendererAccessor",
+    "GameRendererMixin",
+    "ItemInHandRendererMixin",
+    "KeyboardHandlerMixin",
+    "KeyboardInputMixin",
+    "LevelRendererMixin",
+    "LivingEntityRendererMixin",
+    "LocalPlayerMixin",
+    "MinecraftMixin",
+    "PlayerTabOverlayAccessor",
+    "PlayerTabOverlayMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}
