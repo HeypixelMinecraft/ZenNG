@@ -61,6 +61,18 @@ export type DynamicIsland = {
   data: Record<string, unknown>;
 };
 
+export type NeverloseWatermark = {
+  enabled: boolean;
+  visible: boolean;
+  style: string;
+  username: string;
+  config: string;
+  ping: string;
+  fps: string;
+  server: string;
+  time: string;
+};
+
 export type UiState = {
   success: boolean;
   screen: { width: number; height: number; fps: number };
@@ -72,4 +84,5 @@ export type UiState = {
   players: PlayerInfo[];
   scaffold: ScaffoldInfo;
   dynamicIsland: DynamicIsland;
+  watermark: NeverloseWatermark;
 };

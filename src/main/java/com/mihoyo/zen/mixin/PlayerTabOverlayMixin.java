@@ -1,6 +1,5 @@
 package com.mihoyo.zen.mixin;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,7 +21,6 @@ import com.mihoyo.zen.ZenClient;
 import com.mihoyo.zen.event.impl.ChatReceiveEvent;
 import com.mihoyo.zen.hud.TabListInfo;
 import com.mihoyo.zen.modules.impl.render.Watermark;
-import com.mihoyo.zen.settings.impl.ModeSetting;
 
 @Mixin(PlayerTabOverlay.class)
 public class PlayerTabOverlayMixin  {
@@ -78,18 +76,12 @@ public class PlayerTabOverlayMixin  {
         if (!ZenClient.isReady() || ZenClient.getInstance().getModuleManager() == null) return;
         Watermark watermark = ZenClient.getInstance().getModuleManager().getModule(Watermark.class);
         if (watermark == null || !watermark.isEnabled() || !ClientBase.mc.options.keyPlayerList.isDown()) return;
-        try {
-            Field styleField = Watermark.class.getDeclaredField("styleSetting");
-            styleField.setAccessible(true);
-            ModeSetting style = (ModeSetting) styleField.get(watermark);
-            if ("DynamicIsland".equals(style.getValue())) {
-                ci.cancel();
-            } else {
-                zen$renderState.set(true);
-                graphics.pose().pushPose();
-                graphics.pose().translate(0.0f, 30.0f, 0.0f);
-            }
-        } catch (Exception ignored) {
+        if ("DynamicIsland".equals(watermark.getStyle())) {
+            ci.cancel();
+        } else {
+            zen$renderState.set(true);
+            graphics.pose().pushPose();
+            graphics.pose().translate(0.0f, 30.0f, 0.0f);
         }
     }
 

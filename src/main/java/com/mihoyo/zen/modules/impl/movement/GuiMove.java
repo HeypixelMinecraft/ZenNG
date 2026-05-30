@@ -5,8 +5,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.world.inventory.InventoryMenu;
 import com.mihoyo.zen.event.impl.StrafeEvent;
-import com.mihoyo.zen.gui.NewClickGui;
-import com.mihoyo.zen.gui.OldClickGui;
+import com.mihoyo.zen.gui.svelte.SvelteClickGui;
 import com.mihoyo.zen.modules.Category;
 import com.mihoyo.zen.modules.Module;
 import com.mihoyo.zen.modules.impl.player.InventoryManager;
@@ -34,7 +33,7 @@ extends Module {
         if (mc.screen instanceof ChatScreen) {
             return false;
         }
-        if (mc.screen instanceof OldClickGui || mc.screen instanceof NewClickGui) {
+        if (mc.screen instanceof SvelteClickGui) {
             return true;
         }
         if (mc.player == null) {

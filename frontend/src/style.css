@@ -51,8 +51,48 @@ main {
 .hud-panel,
 .effects,
 .target-hud,
-.lie-detector {
+.lie-detector,
+.neverlose-watermark {
   position: absolute;
+}
+
+.neverlose-watermark {
+  top: 10px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.neverlose-section {
+  height: 25px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border-radius: 5px;
+  background: rgba(36, 36, 36, 0.47);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.neverlose-logo {
+  color: #fff;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.material-symbol {
+  color: rgb(42, 180, 255);
+  font-family: "Material Symbols Outlined", "Material Icons", "Segoe UI Symbol", sans-serif;
+  font-size: 15px;
+  line-height: 1;
 }
 
 .hud-panel {

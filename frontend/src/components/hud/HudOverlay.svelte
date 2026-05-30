@@ -8,6 +8,7 @@
   import TargetHud from './TargetHud.svelte';
   import PlayerListHud from './PlayerListHud.svelte';
   import LieDetectorHud from './LieDetectorHud.svelte';
+  import NeverloseWatermark from './NeverloseWatermark.svelte';
 
   let uiState: UiState | null = null;
 
@@ -31,6 +32,7 @@
 
 <main class="hud-overlay">
   {#if uiState}
+    <NeverloseWatermark watermark={uiState.watermark} />
     <DynamicIsland island={uiState.dynamicIsland} scaffold={uiState.scaffold} />
     <ModuleListHud box={hud('ModuleList')} modules={uiState.modules} fps={uiState.screen.fps} />
     <KeyBindsHud box={hud('KeyBinds')} keybinds={uiState.keybinds} />

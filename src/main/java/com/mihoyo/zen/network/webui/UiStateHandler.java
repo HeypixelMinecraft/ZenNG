@@ -9,6 +9,7 @@ import com.mihoyo.zen.modules.impl.combat.KillAura;
 import com.mihoyo.zen.modules.impl.movement.Scaffold;
 import com.mihoyo.zen.modules.impl.render.Interface;
 import com.mihoyo.zen.modules.impl.render.NameProtect;
+import com.mihoyo.zen.modules.impl.render.Watermark;
 import com.mihoyo.zen.modules.impl.world.AutoPlay;
 import com.mihoyo.zen.utils.game.BlockUtil;
 import com.mihoyo.zen.utils.game.MovementUtil;
@@ -25,13 +26,16 @@ import net.minecraft.world.item.ItemStack;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class UiStateHandler extends AbstractHttpHandler {
     private static final Gson GSON = new Gson();
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
     @Override
     public int handleRequest(InputStream in, OutputStream out, HttpExchange exchange) throws Throwable {
@@ -47,6 +51,7 @@ public class UiStateHandler extends AbstractHttpHandler {
         response.put("players", players());
         response.put("scaffold", scaffold());
         response.put("dynamicIsland", dynamicIsland());
+        response.put("watermark", watermark());
         out.write(GSON.toJson(response).getBytes(StandardCharsets.UTF_8));
         return 200;
     }
@@ -169,6 +174,13 @@ public class UiStateHandler extends AbstractHttpHandler {
 
     private static Map<String, Object> dynamicIsland() {
         Map<String, Object> island = new HashMap<>();
+        Watermark watermark = watermarkModule();
+        if (watermark == null || !watermark.isEnabled() || !"DynamicIsland".equals(watermark.getStyle())) {
+            island.put("visible", false);
+            island.put("type", "hidden");
+            island.put("data", Map.of());
+            return island;
+        }
         Map<String, Object> size = new HashMap<>();
         size.put("alignment", "top");
         if (ClientBase.mc.options.keyPlayerList.isDown()) {
@@ -215,6 +227,31 @@ public class UiStateHandler extends AbstractHttpHandler {
         return island;
     }
 
+    private static Map<String, Object> watermark() {
+        Map<String, Object> data = new HashMap<>();
+        Watermark watermark = watermarkModule();
+        boolean enabled = watermark != null && watermark.isEnabled();
+        String style = watermark == null ? "DynamicIsland" : watermark.getStyle();
+        data.put("enabled", enabled);
+        data.put("style", style);
+        data.put("visible", enabled && "Neverlose".equals(style));
+        data.put("username", ClientBase.mc.player != null ? ClientBase.mc.player.getGameProfile().getName() : "Player");
+        data.put("config", "Default Config");
+        data.put("ping", pingText());
+        data.put("fps", ClientBase.mc.getFps() + "fps");
+        data.put("server", serverName());
+        data.put("time", TIME_FORMAT.format(new Date()));
+        return data;
+    }
+
+    private static Watermark watermarkModule() {
+        try {
+            return ZenClient.getInstance().getModuleManager().getModule(Watermark.class);
+        } catch (Throwable throwable) {
+            return null;
+        }
+    }
+
     private static Map<String, String> serverInfo() {
         if (ClientBase.mc.isSingleplayer()) {
             return Map.of("line1", "Singleplayer", "line2", "1ms");
@@ -229,6 +266,19 @@ public class UiStateHandler extends AbstractHttpHandler {
             }
         }
         return Map.of("line1", serverIp, "line2", ping + "ms");
+    }
+
+    private static String serverName() {
+        ServerData serverData = ClientBase.mc.getCurrentServer();
+        return serverData != null ? serverData.ip : "Singleplayer";
+    }
+
+    private static String pingText() {
+        if (ClientBase.mc.player == null || ClientBase.mc.player.connection == null) {
+            return "0ms";
+        }
+        PlayerInfo playerInfo = ClientBase.mc.player.connection.getPlayerInfo(ClientBase.mc.player.getUUID());
+        return playerInfo == null ? "0ms" : playerInfo.getLatency() + "ms";
     }
 
     private static int blockCount() {

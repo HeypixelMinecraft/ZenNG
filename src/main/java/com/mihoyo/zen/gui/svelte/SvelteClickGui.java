@@ -1,7 +1,6 @@
 package com.mihoyo.zen.gui.svelte;
 
 import com.mihoyo.zen.ClientBase;
-import com.mihoyo.zen.gui.PanelClickGui;
 import com.mihoyo.zen.network.webui.WebUiServer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -54,12 +53,12 @@ public class SvelteClickGui extends Screen {
     protected void init() {
         super.init();
         if (!WebUiServer.ensureStarted(false) || !McefBrowserBridge.isReady()) {
-            ClientBase.logger.warn("MCEF is not ready, falling back to PanelClickGui");
-            minecraft.setScreen(PanelClickGui.panelClickGui);
+            ClientBase.logger.warn("MCEF is not ready, closing Svelte ClickGUI");
+            minecraft.setScreen(null);
             return;
         }
         if (!preload()) {
-            minecraft.setScreen(PanelClickGui.panelClickGui);
+            minecraft.setScreen(null);
             return;
         }
         browser = sharedBrowser;
