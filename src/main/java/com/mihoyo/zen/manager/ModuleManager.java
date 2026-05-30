@@ -34,6 +34,7 @@ import com.mihoyo.zen.modules.impl.movement.FireballBlink;
 import com.mihoyo.zen.modules.impl.movement.Fly;
 import com.mihoyo.zen.modules.impl.movement.GuiMove;
 import com.mihoyo.zen.modules.impl.movement.HighJump;
+import com.mihoyo.zen.modules.impl.movement.MoveFix;
 import com.mihoyo.zen.modules.impl.movement.NoDelay;
 import com.mihoyo.zen.modules.impl.movement.NoPush;
 import com.mihoyo.zen.modules.impl.movement.Scaffold;
@@ -109,6 +110,7 @@ public class ModuleManager extends ClientBase {
         this.register(new Fly());
         this.register(new GuiMove());
         this.register(new HighJump());
+        this.register(new MoveFix());
         this.register(new NoDelay());
         this.register(new NoPush());
         this.register(new Scaffold());

@@ -63,6 +63,7 @@ public class Scaffold extends Module {
     public final BooleanSetting sneak = new BooleanSetting("Sneak", true);
     public final BooleanSetting snap = new BooleanSetting("Snap", true, () -> this.mode.is("Normal"));
     public final BooleanSetting renderItemSpoof = new BooleanSetting("Render Item Spoof", true);
+    public final BooleanSetting moveFix = new BooleanSetting("MoveFix", true);
     public final NumberSetting rotationTick = new NumberSetting("Rotation Tick", 3, 1, 6, 1);
     public final BooleanSetting clutch = new BooleanSetting("Clutch", true);
 
@@ -109,6 +110,7 @@ public class Scaffold extends Module {
             this.packetBatches.clear();
             this.packetBatches.add(new CopyOnWriteArrayList<>());
         }
+        this.updateMoveFixOverride();
         super.onEnable();
     }
 
@@ -126,7 +128,21 @@ public class Scaffold extends Module {
             this.canBuildNow = true;
             ClientBase.delayPackets.clear();
         }
+        if (MoveFix.INSTANCE != null) {
+            MoveFix.INSTANCE.updateOverwrite();
+        }
         super.onDisable();
+    }
+
+    private void updateMoveFixOverride() {
+        if (MoveFix.INSTANCE == null) {
+            return;
+        }
+        if (this.moveFix.getValue()) {
+            MoveFix.INSTANCE.applyForceStrafe(true, true);
+        } else {
+            MoveFix.INSTANCE.updateOverwrite();
+        }
     }
 
     private void processBatchedPackets(List<Packet<?>> batch) {
@@ -178,6 +194,7 @@ public class Scaffold extends Module {
     @EventTarget(value = 1)
     public void onTick(TickEvent event) {
         if (mc.player == null) return;
+        this.updateMoveFixOverride();
         this.packetBatches.add(new CopyOnWriteArrayList<>());
         if (this.velocityDelay > 0) this.velocityDelay--;
         if (mc.player.onGround() && this.velocityDelay <= 30) this.velocityDelay = 0;

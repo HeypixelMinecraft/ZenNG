@@ -16,6 +16,7 @@ import com.mihoyo.zen.event.impl.RayTraceEvent;
 import com.mihoyo.zen.event.impl.RotationEvent;
 import com.mihoyo.zen.event.impl.SneakEvent;
 import com.mihoyo.zen.event.impl.StuckInBlockEvent;
+import com.mihoyo.zen.modules.impl.movement.MoveFix;
 import com.mihoyo.zen.utils.misc.ReflectionUtil;
 
 @Mixin(Entity.class)
@@ -54,6 +55,12 @@ public abstract class EntityMixin {
         RotationEvent event = new RotationEvent(entity.getYRot(), speed);
         if (ZenClient.isReady() && entity == ClientBase.mc.player) {
             ZenClient.getInstance().getEventBus().call(event);
+        }
+        if (MoveFix.INSTANCE != null && MoveFix.INSTANCE.handleMoveRelative(entity, speed, movement, event.getYaw())) {
+            if (ZenClient.isReady() && entity == ClientBase.mc.player) {
+                ZenClient.getInstance().getEventBus().call(new PreTickEvent());
+            }
+            return;
         }
         Vec3 result = zen$applyRotation(movement, speed, event.getYaw());
         entity.setDeltaMovement(entity.getDeltaMovement().add(result));

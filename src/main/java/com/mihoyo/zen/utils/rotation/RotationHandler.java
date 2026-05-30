@@ -13,7 +13,6 @@ import com.mihoyo.zen.event.impl.MotionEvent;
 import com.mihoyo.zen.event.impl.PacketEvent;
 import com.mihoyo.zen.event.impl.RayTraceEvent;
 import com.mihoyo.zen.event.impl.RotationEvent;
-import com.mihoyo.zen.event.impl.StrafeEvent;
 import com.mihoyo.zen.event.impl.TickEvent;
 import com.mihoyo.zen.event.impl.UseItemRayTraceEvent;
 import com.mihoyo.zen.event.impl.WorldChangeEvent;
@@ -30,7 +29,6 @@ import com.mihoyo.zen.modules.impl.player.AutoWebPlace;
 import com.mihoyo.zen.modules.impl.player.Helper;
 import com.mihoyo.zen.modules.impl.player.MidPearl;
 import com.mihoyo.zen.utils.animation.TickTimer;
-import com.mihoyo.zen.utils.game.MovementUtil;
 import com.mihoyo.zen.utils.misc.ReflectionUtil;
 import com.mihoyo.zen.event.EventTarget;
 
@@ -165,14 +163,6 @@ extends ClientBase {
             ClientBase.yaw = targetRotation.getYaw();
             sentRotation = new Rotation(e.getYaw(), e.getPitch());
             prevRotation = new Rotation(e.getYaw(), e.getPitch());
-        }
-    }
-
-    @EventTarget
-    public void onStrafe(StrafeEvent strafeEvent) {
-        if (isRotating && targetRotation != null) {
-            float yaw = targetRotation.getYaw();
-            MovementUtil.handleStrafe(strafeEvent, yaw);
         }
     }
 
