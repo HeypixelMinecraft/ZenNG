@@ -28,6 +28,28 @@ public class SvelteClickGui extends Screen {
         return WebUiServer.ensureStarted(false) && McefBrowserBridge.isReady();
     }
 
+    static boolean preload() {
+        if (!WebUiServer.ensureStarted(false) || !McefBrowserBridge.isReady()) {
+            return false;
+        }
+        if (sharedBrowser == null) {
+            sharedBrowser = McefBrowserBridge.create(WebUiServer.SVELTE_GUI_URL + "?ingame=1", true);
+            if (sharedBrowser == null) {
+                return false;
+            }
+            sharedBrowser.focus(false);
+            sharedBrowserCreatedAt = System.currentTimeMillis();
+        }
+        Minecraft mc = ClientBase.mc;
+        if (mc != null && mc.getWindow() != null) {
+            double scale = mc.getWindow().getGuiScale();
+            int width = Math.max(1, (int)(mc.getWindow().getGuiScaledWidth() * scale));
+            int height = Math.max(1, (int)(mc.getWindow().getGuiScaledHeight() * scale));
+            sharedBrowser.resize(width, height);
+        }
+        return true;
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -36,13 +58,9 @@ public class SvelteClickGui extends Screen {
             minecraft.setScreen(PanelClickGui.panelClickGui);
             return;
         }
-        if (sharedBrowser == null) {
-            sharedBrowser = McefBrowserBridge.create(WebUiServer.SVELTE_GUI_URL + "?ingame=1", true);
-            if (sharedBrowser == null) {
-                minecraft.setScreen(PanelClickGui.panelClickGui);
-                return;
-            }
-            sharedBrowserCreatedAt = System.currentTimeMillis();
+        if (!preload()) {
+            minecraft.setScreen(PanelClickGui.panelClickGui);
+            return;
         }
         browser = sharedBrowser;
         browser.focus(true);

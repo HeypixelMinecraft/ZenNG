@@ -13,6 +13,7 @@ import com.mihoyo.zen.event.EventBus;
 import com.mihoyo.zen.event.EventTarget;
 import com.mihoyo.zen.event.impl.TickEvent;
 import com.mihoyo.zen.gui.IntroAnimation;
+import com.mihoyo.zen.gui.svelte.SveltePreloader;
 import com.mihoyo.zen.manager.CommandManager;
 import com.mihoyo.zen.manager.ConfigManager;
 import com.mihoyo.zen.manager.HudManager;
@@ -46,6 +47,7 @@ public class ZenClient extends ClientBase {
     private LagManager lagManager;
     private TargetManager targetManager;
     private int reconnectAttempts;
+    private boolean sveltePreloaded;
 
     public ZenClient() {
         if (instance == null) {
@@ -93,6 +95,9 @@ public class ZenClient extends ClientBase {
             moduleInit = true;
             this.moduleManager.initModules();
             this.configManager.loadAll();
+        }
+        if (isReady() && moduleInit && !sveltePreloaded) {
+            sveltePreloaded = SveltePreloader.preloadAll();
         }
     }
 

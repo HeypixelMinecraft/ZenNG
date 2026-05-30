@@ -36,9 +36,8 @@ public final class SvelteHudOverlay {
         return shouldUseWebHud() && System.currentTimeMillis() - lastRenderAt < 250L;
     }
 
-    public static boolean render(Render2DEvent event) {
-        if (!shouldUseWebHud() || !WebUiServer.ensureStarted(false) || !McefBrowserBridge.isReady()) {
-            lastRenderAt = 0L;
+    static boolean preload() {
+        if (!WebUiServer.ensureStarted(false) || !McefBrowserBridge.isReady()) {
             return false;
         }
         Minecraft mc = ClientBase.mc;
@@ -54,6 +53,29 @@ public final class SvelteHudOverlay {
             browserCreatedAt = System.currentTimeMillis();
             lastWidth = 0;
             lastHeight = 0;
+        }
+        int browserWidth = Math.max(1, mc.getWindow().getGuiScaledWidth());
+        int browserHeight = Math.max(1, mc.getWindow().getGuiScaledHeight());
+        if (browserWidth != lastWidth || browserHeight != lastHeight) {
+            browser.resize(browserWidth, browserHeight);
+            lastWidth = browserWidth;
+            lastHeight = browserHeight;
+        }
+        return true;
+    }
+
+    public static boolean render(Render2DEvent event) {
+        if (!shouldUseWebHud() || !WebUiServer.ensureStarted(false) || !McefBrowserBridge.isReady()) {
+            lastRenderAt = 0L;
+            return false;
+        }
+        Minecraft mc = ClientBase.mc;
+        if (mc == null || mc.getWindow() == null) {
+            return false;
+        }
+        if (!preload()) {
+            lastRenderAt = 0L;
+            return false;
         }
 
         int width = mc.getWindow().getGuiScaledWidth();
