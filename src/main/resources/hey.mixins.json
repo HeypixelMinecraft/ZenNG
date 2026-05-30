@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "shit.zen.mixin",
+  "package": "com.mihoyo.zen.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "hey.refmap.json",
   "mixins": [
