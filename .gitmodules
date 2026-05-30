@@ -1,0 +1,4 @@
+[submodule "vendor/mcef"]
+	path = vendor/mcef
+	url = https://github.com/CinemaMod/mcef.git
+	branch = 1.20.1

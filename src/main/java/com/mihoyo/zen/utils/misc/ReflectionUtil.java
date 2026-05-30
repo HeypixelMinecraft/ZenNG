@@ -16,7 +16,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.BrewingStandMenu;
 import sun.misc.Unsafe;
 import com.mihoyo.zen.ClientBase;
-import com.mihoyo.zen.ZenClient;
 
 public final class ReflectionUtil {
     private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -105,8 +104,8 @@ public final class ReflectionUtil {
 
     public static float getYRot(ServerboundMovePlayerPacket packet) {
         if (ClientBase.mc.gameMode == null) return 0.0f;
-        Field field = findField(packet.getClass(), ZenClient.isMCPMapped ? "f_134121_" : "yRot");
         try {
+            Field field = findField(packet.getClass(), "yRot", "f_134121_");
             return field.getFloat(packet);
         } catch (Exception ex) {
             ClientBase.logger.error("Failed to get yrot field", ex);
@@ -116,8 +115,8 @@ public final class ReflectionUtil {
 
     public static float getXRot(ServerboundMovePlayerPacket packet) {
         if (ClientBase.mc.gameMode == null) return 0.0f;
-        Field field = findField(packet.getClass(), ZenClient.isMCPMapped ? "f_134122_" : "xRot");
         try {
+            Field field = findField(packet.getClass(), "xRot", "f_134122_");
             return field.getFloat(packet);
         } catch (Exception ex) {
             ClientBase.logger.error("Failed to get xrot field", ex);
@@ -127,8 +126,8 @@ public final class ReflectionUtil {
 
     public static void setYRot(ServerboundMovePlayerPacket packet, float yaw) {
         if (ClientBase.mc.gameMode == null) return;
-        Field field = findField(packet.getClass(), ZenClient.isMCPMapped ? "f_134121_" : "yRot");
         try {
+            Field field = findField(packet.getClass(), "yRot", "f_134121_");
             field.setFloat(packet, yaw);
         } catch (Exception ex) {
             ClientBase.logger.error("Failed to set yrot field", ex);
@@ -136,7 +135,7 @@ public final class ReflectionUtil {
     }
 
     public static void setDepthBufferId(RenderTarget renderTarget, int depthBufferId) {
-        Field field = findField(renderTarget.getClass(), ZenClient.isMCPMapped ? "f_83924_" : "depthBufferId");
+        Field field = findField(renderTarget.getClass(), "depthBufferId", "f_83924_");
         try {
             field.setInt(renderTarget, depthBufferId);
         } catch (Exception ex) {
@@ -146,8 +145,8 @@ public final class ReflectionUtil {
 
     public static void setXRot(ServerboundMovePlayerPacket packet, float pitch) {
         if (ClientBase.mc.gameMode == null) return;
-        Field field = findField(packet.getClass(), ZenClient.isMCPMapped ? "f_134122_" : "xRot");
         try {
+            Field field = findField(packet.getClass(), "xRot", "f_134122_");
             field.setFloat(packet, pitch);
         } catch (Exception ex) {
             ClientBase.logger.error("Failed to set xrot field", ex);
@@ -156,7 +155,7 @@ public final class ReflectionUtil {
 
     public static Container getBrewingStand(BrewingStandMenu menu) {
         if (menu == null) return null;
-        Field field = findField(menu.getClass(), ZenClient.isMCPMapped ? "f_39086_" : "brewingStand");
+        Field field = findField(menu.getClass(), "brewingStand", "f_39086_");
         try {
             return (Container) field.get(menu);
         } catch (Exception ex) {
@@ -211,13 +210,26 @@ public final class ReflectionUtil {
     private static Field resolveField(Class<?> clazz, String name) throws NoSuchFieldException {
         NoSuchFieldException last = null;
         for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-            try {
-                return c.getDeclaredField(name);
-            } catch (NoSuchFieldException e) {
-                last = e;
+            for (String candidate : getFieldAliases(name)) {
+                try {
+                    return c.getDeclaredField(candidate);
+                } catch (NoSuchFieldException e) {
+                    last = e;
+                }
             }
         }
         throw last != null ? last : new NoSuchFieldException(name);
+    }
+
+    private static String[] getFieldAliases(String name) {
+        return switch (name) {
+            case "yRot" -> new String[]{"yRot", "f_19857_", "f_134121_"};
+            case "xRot" -> new String[]{"xRot", "f_19858_", "f_134122_"};
+            case "stuckSpeedMultiplier" -> new String[]{"stuckSpeedMultiplier", "f_19865_"};
+            case "depthBufferId" -> new String[]{"depthBufferId", "f_83924_"};
+            case "brewingStand" -> new String[]{"brewingStand", "f_39086_"};
+            default -> new String[]{name};
+        };
     }
 
     private static long getFieldOffset(Class<?> clazz, String name) {

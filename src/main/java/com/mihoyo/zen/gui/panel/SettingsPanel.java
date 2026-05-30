@@ -188,7 +188,7 @@ extends ClientBase {
             }
             this.renderScrollbar(guiGraphics, panelX, panelY, panelHeight, scale, alpha);
         } catch (Exception exception) {
-            // empty catch block
+            logger.error("Failed to render settings panel", exception);
         }
     }
 

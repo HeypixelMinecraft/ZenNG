@@ -143,7 +143,7 @@ extends ClientBase {
                 this.renderScrollbar(guiGraphics, panelX, panelY, panelHeight, scale, alpha);
             }
         } catch (Exception exception) {
-            // empty catch block
+            logger.error("Failed to render module list panel", exception);
         }
     }
 
@@ -160,7 +160,7 @@ extends ClientBase {
             Renderer.render(guiGraphics, drawContext -> this.renderModuleList(null, this.searchResults, panelX, panelY, panelHeight, mouseX, mouseY, alpha, false, scale));
             this.renderScrollbar(guiGraphics, panelX, panelY, panelHeight, scale, alpha);
         } catch (Exception exception) {
-            // empty catch block
+            logger.error("Failed to render search results panel", exception);
         }
     }
 
@@ -235,8 +235,12 @@ extends ClientBase {
             this.totalContentHeight = modules.size() * Math.round(18.0f * scale);
             for (Module module : modules) {
                 float drawY = (float)rowY - this.scrollOffset;
+                boolean hovered = this.isMouseOverModule(module, panelX, (int)drawY, mouseX, mouseY, scale);
                 if (!animating) {
                     this.updateModuleHover(module, panelX, (int)drawY, mouseX, mouseY, scale);
+                    if (hovered) {
+                        this.hoveredModule = module;
+                    }
                 }
                 FontRenderer moduleFont = module.isEnabled() ? FontPresets.axiformaBold(16.0f * scale) : FontPresets.axiformaRegular(16.0f * scale);
                 String moduleName = module.getName();
@@ -338,12 +342,13 @@ extends ClientBase {
         for (Module module : modules) {
             int adjustedRowY;
             if (this.isMouseOverModule(module, panelX, adjustedRowY = (int)((float)rowY - this.scrollOffset), mouseX, mouseY, scale)) {
+                this.hoveredModule = module;
                 if (button == 0) {
                     module.toggle();
                     String stateLabel = module.isEnabled() ? "On" : "Off";
                     PanelClickGui.panelClickGui.addToast(module.getName() + " Module " + stateLabel);
                 } else if (button == 1) {
-                    this.hoveredModule = module;
+                    return true;
                 } else if (button == 2) {
                     PanelClickGui.panelClickGui.selectModule(module);
                 }
